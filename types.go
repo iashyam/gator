@@ -15,13 +15,16 @@ type Commands struct {
 type Command struct {
 	Name        string
 	Description string
+	Arguments  []string
 	Args        []string
+	c     Commands
 }
 
 type State struct {
 	db     *database.Queries
 	Config *config.Config
 }
+
 
 func (commands Commands) Run(state *State, command Command) error {
 

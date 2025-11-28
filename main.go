@@ -28,11 +28,13 @@ func main() {
 	}
 	commandLogin := Command{
 		Name:        "login",
+		Arguments:   []string{"username"},
 		Description: "sets the users to given user",
 		Args:        os.Args,
 	}
 	commandRegister := Command{
 		Name:        "register",
+		Arguments:   []string{"username"},
 		Description: "creates a new user and logs it in",
 		Args:        os.Args,
 	}
@@ -48,11 +50,13 @@ func main() {
 	}
 	commandAgg := Command{
 		Name:        "agg",
-		Description: "fatches the rss feed of a url",
+		Arguments:   []string{"duration"},
+		Description: "aggregates feeds from all users for a given duration",
 		Args:        os.Args,
 	}
 	commandAddFeed := Command{
 		Name:        "addfeed",
+		Arguments:   []string{"name", "url"},
 		Description: "takes a name and url and adds it to the databse",
 		Args:        os.Args,
 	}
@@ -63,6 +67,7 @@ func main() {
 	}
 	commandFollow := Command{
 		Name:        "follow",
+		Arguments:   []string{"url"},
 		Description: "follow a feed by url",
 		Args:        os.Args,
 	}
@@ -73,6 +78,7 @@ func main() {
 	}
 	commandUnfollowFeed := Command{
 		Name:        "unfollow",
+		Arguments:   []string{"url"},
 		Description: "unfllows feed given in url",
 		Args:        os.Args,
 	}
@@ -81,8 +87,11 @@ func main() {
 		Description: "lists the posts from feeds followed by the user",
 		Args:        os.Args,
 	}
+	commandHelp := Command{
+		Name:        "help",
+		Description: "Provides help information for commands",
+	}
 	// fmt.Println(os.Args)
-	command := os.Args[1]
 
 	commands.Register("login", commandLogin, HandlerLogin)
 	commands.Register("register", commandRegister, HandlerRegistger)
@@ -95,6 +104,18 @@ func main() {
 	commands.Register("following", commandListFollowing, middleWareLoggedIn(HandlerListFollowing))
 	commands.Register("unfollow", commandUnfollowFeed, middleWareLoggedIn(HandlerUnfollowFeed))
 	commands.Register("browse", commandBrowse, middleWareLoggedIn(HandlerBrowse))
+	commands.Register("help", commandHelp, HandlerHelp)
+
+	if len(os.Args) < 2 {
+		fmt.Println("Welcomt to Gator RSS Feed Reader!")
+		commandHelp.c = commands
+		err = commands.Run(&state, commandHelp)
+		if err != nil {
+			fmt.Printf("error: %v\n", err)
+		}
+		os.Exit(0)
+	}
+	command := os.Args[1]
 
 	commandToRun, ok := commands.CommandMap[command]
 	if !ok {

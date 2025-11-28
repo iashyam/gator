@@ -303,3 +303,15 @@ func HandlerBrowse(state *State, command Command, user database.User) error {
 
 	return nil
 }
+
+func HandlerHelp(state *State, command Command) error {
+	fmt.Println("Available commands:")
+
+	for _, cmd := range command.c.CommandMap {
+		fmt.Printf(" - %s: %s\n", cmd.Name, cmd.Description)
+		if len(cmd.Arguments) > 0 {
+			fmt.Printf("   Arguments: %v\n", cmd.Arguments)
+		}
+	}
+	return nil
+}
