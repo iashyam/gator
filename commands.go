@@ -315,3 +315,8 @@ func HandlerHelp(state *State, command Command) error {
 	}
 	return nil
 }
+
+func HandlerVersion(state *State, command Command) error {
+	fmt.Println("Gator RSS Feed Reader v0.1.0")
+	return nil
+}

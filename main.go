@@ -13,10 +13,17 @@ import (
 )
 
 func main() {
-	cfg, _ := config.ReadConfig()
+	cfg, cfgError := config.ReadConfig()
+
+	if cfgError != nil {
+		fmt.Println("Error reading config file. Make sure you have created a config file using the instructions in the README.md")
+		log.Fatalf("Error reading config file: %v", cfgError)
+	}
+
 	dbUrl := cfg.Db_url
 	db, err := sql.Open("postgres", dbUrl)
 	if err != nil {
+		fmt.Println("Make sure that postgres is installed and running and the url is correct!")
 		log.Fatalf("Can't open the postgress databse check url %s", dbUrl)
 	}
 	dbQuiries := database.New(db)
@@ -87,10 +94,15 @@ func main() {
 		Description: "lists the posts from feeds followed by the user",
 		Args:        os.Args,
 	}
+	commandVersion := Command{
+		Name:        "version",
+		Description: "Provides help information for commands",
+	}
 	commandHelp := Command{
 		Name:        "help",
 		Description: "Provides help information for commands",
 	}
+
 	// fmt.Println(os.Args)
 
 	commands.Register("login", commandLogin, HandlerLogin)
@@ -104,9 +116,10 @@ func main() {
 	commands.Register("following", commandListFollowing, middleWareLoggedIn(HandlerListFollowing))
 	commands.Register("unfollow", commandUnfollowFeed, middleWareLoggedIn(HandlerUnfollowFeed))
 	commands.Register("browse", commandBrowse, middleWareLoggedIn(HandlerBrowse))
+	commands.Register("version", commandVersion, HandlerVersion)
 	commands.Register("help", commandHelp, HandlerHelp)
 
-	if len(os.Args) < 2 {
+	if len(os.Args) < 2 || os.Args[1] == "help" {
 		fmt.Println("Welcomt to Gator RSS Feed Reader!")
 		commandHelp.c = commands
 		err = commands.Run(&state, commandHelp)
